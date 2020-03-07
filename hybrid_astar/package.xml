@@ -3,9 +3,9 @@
   <name>hybrid_astar</name>
   <version>0.0.2</version>
   <description>The hybrid_astar package</description>
-  <maintainer email="kurzer@kth.se">Karl Kurzer</maintainer>
+  <maintainer email="weihunko@umich.edu">Weihung Ko</maintainer>
   <license>BSD</license>
-  <author email="kurzer@kth.se">Karl Kurzer</author>
+  <author email="weihunko@umich.edu">Weihung Ko</author>
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roscpp</build_depend>
