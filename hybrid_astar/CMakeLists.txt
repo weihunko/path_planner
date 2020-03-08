@@ -19,7 +19,6 @@ find_package(catkin REQUIRED COMPONENTS
     roscpp
     rospy
     std_msgs
-    tf
     )
 
 set(HEADERS
@@ -27,11 +26,8 @@ set(HEADERS
     include/node2d.h
     include/node3d.h
     include/collisiondetection.h
-    include/planner.h
-    include/path.h
     include/smoother.h
     include/vector2d.h
-    include/visualize.h
     include/helper.h
     include/constants.h
     include/lookup.h
@@ -46,11 +42,7 @@ set(SOURCES
     src/algorithm.cpp
     src/node2d.cpp
     src/node3d.cpp
-    src/collisiondetection.cpp
-    src/planner.cpp
-    src/path.cpp
     src/smoother.cpp
-    src/visualize.cpp
     src/dubins.cpp #Andrew Walker
     src/dynamicvoronoi.cpp #Boris Lau, Christoph Sprunk, Wolfram Burgard
     src/bucketedqueue.cpp #Boris Lau, Christoph Sprunk, Wolfram Burgard

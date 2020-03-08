@@ -1,11 +1,11 @@
 #include "algorithm.h"
-
+#include <queue>
 #include <boost/heap/binomial_heap.hpp>
 
 using namespace HybridAStar;
 
-float aStar(Node2D& start, Node2D& goal, Node2D* nodes2D, int width, int height, CollisionDetection& configurationSpace, Visualize& visualization);
-void updateH(Node3D& start, const Node3D& goal, Node2D* nodes2D, float* dubinsLookup, int width, int height, CollisionDetection& configurationSpace, Visualize& visualization);
+float aStar(Node2D& start, Node2D& goal, Node2D* nodes2D, int width, int height, CollisionDetection& configurationSpace);
+void updateH(Node3D& start, const Node3D& goal, Node2D* nodes2D, float* dubinsLookup, int width, int height, CollisionDetection& configurationSpace);
 Node3D* dubinsShot(Node3D& start, const Node3D& goal, CollisionDetection& configurationSpace);
 
 //###################################################
@@ -35,8 +35,7 @@ Node3D* Algorithm::hybridAStar(Node3D& start,
                                int width,
                                int height,
                                CollisionDetection& configurationSpace,
-                               float* dubinsLookup,
-                               Visualize& visualization) {
+                               float* dubinsLookup) {
 
   // PREDECESSOR AND SUCCESSOR INDEX
   int iPred, iSucc;
@@ -46,17 +45,11 @@ Node3D* Algorithm::hybridAStar(Node3D& start,
   // Number of iterations the algorithm has run for stopping based on Constants::iterations
   int iterations = 0;
 
-  // VISUALIZATION DELAY
-  ros::Duration d(0.003);
 
-  // OPEN LIST AS BOOST IMPLEMENTATION
-  typedef boost::heap::binomial_heap<Node3D*,
-          boost::heap::compare<CompareNodes>
-          > priorityQueue;
-  priorityQueue O;
+  std::priority_queue<Node3D*, std::vector<Node3D*>, CompareNodes> O;
 
   // update h value
-  updateH(start, goal, nodes2D, dubinsLookup, width, height, configurationSpace, visualization);
+  updateH(start, goal, nodes2D, dubinsLookup, width, height, configurationSpace);
   // mark start as open
   start.open();
   // push on priority queue aka open list
@@ -128,13 +121,6 @@ Node3D* Algorithm::hybridAStar(Node3D& start,
     iPred = nPred->setIdx(width, height);
     iterations++;
 
-    // RViz visualization
-    if (Constants::visualization) {
-      visualization.publishNode3DPoses(*nPred);
-      visualization.publishNode3DPose(*nPred);
-      d.sleep();
-    }
-
     // _____________________________
     // LAZY DELETION of rewired node
     // if there exists a pointer this node has already been expanded
@@ -195,7 +181,7 @@ Node3D* Algorithm::hybridAStar(Node3D& start,
               if (!nodes3D[iSucc].isOpen() || newG < nodes3D[iSucc].getG() || iPred == iSucc) {
 
                 // calculate H value
-                updateH(*nSucc, goal, nodes2D, dubinsLookup, width, height, configurationSpace, visualization);
+                updateH(*nSucc, goal, nodes2D, dubinsLookup, width, height, configurationSpace);
 
                 // if the successor is in the same cell but the C value is larger
                 if (iPred == iSucc && nSucc->getC() > nPred->getC() + Constants::tieBreaker) {
@@ -239,8 +225,7 @@ float aStar(Node2D& start,
             Node2D* nodes2D,
             int width,
             int height,
-            CollisionDetection& configurationSpace,
-            Visualize& visualization) {
+            CollisionDetection& configurationSpace) {
 
   // PREDECESSOR AND SUCCESSOR INDEX
   int iPred, iSucc;
@@ -250,9 +235,6 @@ float aStar(Node2D& start,
   for (int i = 0; i < width * height; ++i) {
     nodes2D[i].reset();
   }
-
-  // VISUALIZATION DELAY
-  ros::Duration d(0.001);
 
   boost::heap::binomial_heap<Node2D*,
         boost::heap::compare<CompareNodes>> O;
@@ -290,13 +272,6 @@ float aStar(Node2D& start,
       // add node to closed list
       nodes2D[iPred].close();
       nodes2D[iPred].discover();
-
-      // RViz visualization
-      if (Constants::visualization2D) {
-        visualization.publishNode2DPoses(*nPred);
-        visualization.publishNode2DPose(*nPred);
-        //        d.sleep();
-      }
 
       // remove node from open list
       O.pop();
@@ -348,7 +323,7 @@ float aStar(Node2D& start,
 //###################################################
 //                                         COST TO GO
 //###################################################
-void updateH(Node3D& start, const Node3D& goal, Node2D* nodes2D, float* dubinsLookup, int width, int height, CollisionDetection& configurationSpace, Visualize& visualization) {
+void updateH(Node3D& start, const Node3D& goal, Node2D* nodes2D, float* dubinsLookup, int width, int height, CollisionDetection& configurationSpace) {
   float dubinsCost = 0;
   float reedsSheppCost = 0;
   float twoDCost = 0;
@@ -439,7 +414,7 @@ void updateH(Node3D& start, const Node3D& goal, Node2D* nodes2D, float* dubinsLo
     // create a 2d goal node
     Node2D goal2d(goal.getX(), goal.getY(), 0, 0, nullptr);
     // run 2d astar and return the cost of the cheapest path for that node
-    nodes2D[(int)start.getY() * width + (int)start.getX()].setG(aStar(goal2d, start2d, nodes2D, width, height, configurationSpace, visualization));
+    nodes2D[(int)start.getY() * width + (int)start.getX()].setG(aStar(goal2d, start2d, nodes2D, width, height, configurationSpace));
     //    ros::Time t1 = ros::Time::now();
     //    ros::Duration d(t1 - t0);
     //    std::cout << "calculated 2D Heuristic in ms: " << d * 1000 << std::endl;

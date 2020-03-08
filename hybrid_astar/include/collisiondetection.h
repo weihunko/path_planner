@@ -31,7 +31,7 @@ void getConfiguration(const Node3D* node, float& x, float& y, float& t) {
 class CollisionDetection {
  public:
   /// Constructor
-  CollisionDetection();
+  CollisionDetection() = default;
 
 
   /*!

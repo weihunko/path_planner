@@ -10,13 +10,9 @@ typedef ompl::base::SE2StateSpace::StateType State;
 
 #include "node3d.h"
 #include "node2d.h"
-#include "visualize.h"
 #include "collisiondetection.h"
 
 namespace HybridAStar {
-class Node3D;
-class Node2D;
-class Visualize;
 
 /*!
  * \brief A class that encompasses the functions central to the search.
@@ -38,7 +34,6 @@ class Algorithm {
      \param height the height of the grid in number of cells
      \param configurationSpace the lookup of configurations and their spatial occupancy enumeration
      \param dubinsLookup the lookup of analytical solutions (Dubin's paths)
-     \param visualization the visualization object publishing the search to RViz
      \return the pointer to the node satisfying the goal condition
   */
   static Node3D* hybridAStar(Node3D& start,
@@ -48,8 +43,7 @@ class Algorithm {
                              int width,
                              int height,
                              CollisionDetection& configurationSpace,
-                             float* dubinsLookup,
-                             Visualize& visualization);
+                             float* dubinsLookup);
 
 };
 }
